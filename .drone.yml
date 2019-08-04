@@ -1,0 +1,57 @@
+    
+kind: pipeline
+name: default
+
+steps:
+  - name: test
+    image: node:10-alpine
+    commands:
+      - npm install
+    when:
+    branch:
+      - master
+    event:
+      - push
+      - pull-request
+
+  - name: deploy
+    image: docker
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+    environment:
+      PORT:
+        from_secret: PORT
+    settings:
+      build_args_from_env:
+      - PORT
+    commands:
+      - docker build -t nick/collaudo_backend .
+      - docker rmi -f $(docker images -f "dangling=true" -q) || true
+      - docker container stop collaudo_backend || true && docker rm collaudo_backend || true
+      - docker run -v /home/collaudo_logs:/home/node/collaudo_backend/logs -v /home/ssl:/home/node/collaudo_backend/ssl -e PORT=$PORT -p 8903:3000 -d --restart="always" --name=collaudo_backend nick/collaudo_backend
+
+  - name: telegram
+    image: appleboy/drone-telegram:latest
+    settings:
+      token:
+        from_secret: telegram_token
+      to:
+        from_secret: telegram_user_id
+      message: >
+      format: html
+      message: >
+        {{#success build.status}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">SUCCESS</a> 
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{else}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">FAILURE</a>
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{/success}}
+    when:
+      status: [success, failure]
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
