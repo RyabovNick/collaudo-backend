@@ -22,14 +22,17 @@ steps:
     environment:
       PORT:
         from_secret: PORT
+      HOST:
+        from_secret: HOST
     settings:
       build_args_from_env:
       - PORT
+      - HOST
     commands:
       - docker build -t nick/collaudo_backend .
       - docker rmi -f $(docker images -f "dangling=true" -q) || true
       - docker container stop collaudo_backend || true && docker rm collaudo_backend || true
-      - docker run -v /home/collaudo_logs:/home/node/collaudo_backend/logs -v /home/ssl:/home/node/collaudo_backend/ssl -e PORT=$PORT -p 8903:3000 -d --restart="always" --name=collaudo_backend nick/collaudo_backend
+      - docker run -v /home/collaudo_logs:/home/node/collaudo_backend/logs -v /home/ssl:/home/node/collaudo_backend/ssl -e PORT=$PORT -e HOST=$HOST -p 8903:3000 -d --restart="always" --name=collaudo_backend nick/collaudo_backend
 
   - name: telegram
     image: appleboy/drone-telegram:latest

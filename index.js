@@ -73,7 +73,11 @@ fastify.get('/', async (request, reply) => {
 // set /api prefix to all API
 fastify.register(require('./api'), { prefix: '/api' })
 
-fastify.listen(process.env.PORT, (err, address) => {
-  if (err) throw err
-  console.log(`server listening on ${address}`)
-})
+fastify.listen(
+  process.env.PORT || 3000,
+  process.env.HOST || '127.0.0.1',
+  (err, address) => {
+    if (err) throw err
+    console.log(`server listening on ${address}`)
+  }
+)
