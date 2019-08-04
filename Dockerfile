@@ -11,9 +11,11 @@ WORKDIR /home/node/collaudo_backend
 
 ADD . /home/node/collaudo_backend
 
+RUN npm config set unsafe-perm true
+
 RUN mkdir /home/node/collaudo_backend/logs
 RUN chmod 755 /home/node/collaudo_backend/logs
-RUN npm install pm2 -g
+RUN npm install pm2 -g --silent
 
 EXPOSE 3000
 
