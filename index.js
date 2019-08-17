@@ -23,7 +23,7 @@ const logger = winston.createLogger({
     warn: 2,
     info: 3,
     trace: 4,
-    debug: 5
+    debug: 5,
   },
   // Setup log level
   level: 'info',
@@ -32,12 +32,12 @@ const logger = winston.createLogger({
   // Define transports to write logs, it could be http, file or console
   transports: [
     new winston.transports.File({ filename: errorLogsPath, level: 'error' }),
-    new winston.transports.File({ filename: combinedLogsPath })
-  ]
+    new winston.transports.File({ filename: combinedLogsPath }),
+  ],
 })
 
 const fastify = require('fastify')({
-  logger: true // set to "logger" to turn on winston log
+  logger: true, // set to "logger" to turn on winston log
 })
 const cors = require('fastify-cors')
 
@@ -45,7 +45,7 @@ fastify.register(cors, {
   origin: '*',
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['token'],
-  credentials: true
+  credentials: true,
 })
 
 fastify.setNotFoundHandler((request, reply) => {
@@ -54,13 +54,13 @@ fastify.setNotFoundHandler((request, reply) => {
   reply.status(404).send({ message: 'Not found' })
 })
 
-fastify.setErrorHandler((error, request, reply) => {
-  fastify.log.debug(`Request url: `, request.req.url)
-  fastify.log.debug(`Payload: `, request.body)
-  fastify.log.error(`Error occurred: `, error)
+// fastify.setErrorHandler((error, request, reply) => {
+//   fastify.log.debug(`Request url: `, request.req.url)
+//   fastify.log.debug(`Payload: `, request.body)
+//   fastify.log.error(`Error occurred: `, error)
 
-  reply.status(500).send({ message: 'Error occurred during request' })
-})
+//   reply.status(500).send({ message: 'Error occurred during request' })
+// })
 
 fastify.get('/', async (request, reply) => {
   fastify.log.info('Sending hello')
@@ -79,5 +79,5 @@ fastify.listen(
   (err, address) => {
     if (err) throw err
     console.log(`server listening on ${address}`)
-  }
+  },
 )

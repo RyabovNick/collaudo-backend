@@ -7,6 +7,12 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Node",
+      "program": "${workspaceFolder}/index.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "nodemon",
       "runtimeExecutable": "nodemon",
       "program": "${workspaceFolder}/index.js",
