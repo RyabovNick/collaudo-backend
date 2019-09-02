@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const fse = require('fs-extra')
 const winston = require('winston')
+const AuthDecorator = require('./lib/authDecorator')
 
 const errorLogsPath = './logs/error.log'
 const combinedLogsPath = './logs/combined.log'
@@ -72,6 +73,8 @@ fastify.get('/', async (request, reply) => {
 // register folder with all API
 // set /api prefix to all API
 fastify.register(require('./api'), { prefix: '/api' })
+
+fastify.decorate('authenticate', AuthDecorator)
 
 fastify.listen(
   process.env.PORT || 3000,
